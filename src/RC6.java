@@ -121,7 +121,6 @@ public class RC6 {
     }
 
     private static int[] generateSubkeys(byte[] key) {
-
         int u = W / 8;
         int c = key.length / u;
         int t = 2 * R + 4;
@@ -144,7 +143,6 @@ public class RC6 {
             B = L[j] = rotl(L[j] + A + B, A + B);
             k = (k + 1) % t;
             j = (j + 1) % c;
-
         }
         return S;
     }
