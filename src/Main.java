@@ -1,3 +1,4 @@
+import java.util.Scanner;
 
 /**
  * Created by Furman on 16.05.2017.
@@ -5,16 +6,62 @@
 public class Main {
 
     public static void main(String[] args) {
-        try {
-            String key = "dsadasdfasgfwaet235214123";
-            RC6 rc6 = new RC6(key.getBytes());
-            printByteMas(rc6.decryptBlock(rc6.encryptBlock(new byte[]{24,43,45,42,-42,-67,-42,-52,-23,127,23,24,23,87,45,91})));
+        System.setProperty("file.encoding", "UTF-16");
+        printMenu();
+    }
+
+    public static void printMenu(){
+        System.out.println("1 - Зашифровать слово");
+        System.out.println("2 - Расшифровать слово");
+        System.out.println("3 - Выйти из программы:");
+        System.out.println("Введите цифру(1/2/3):");
+        Scanner scanner = new Scanner(System.in);
+        int k = -1;
+        while ((k<1) || (k>3)){
+            k = scanner.nextInt();
         }
-        catch (Exception e){}
+        switch (k){
+            case 1:
+                System.out.println();
+                System.out.println("Введите ключ:");
+                String key = scanner.next();
+                System.out.println("Введите слово:");
+                String word = scanner.next();
+                System.out.println("\nРезультат:");
+                System.out.println(new String(encrypt(word.getBytes(),key.getBytes())));
+                System.out.println();
+                printMenu();
+                break;
+            case 2:
+                System.out.println();
+                System.out.println("Введите ключ:");
+                key = scanner.next();
+                System.out.println("Введите слово:");
+                word = scanner.next();
+                System.out.println("\nРезультат:");
+                System.out.println(new String(decrypt(word.getBytes(),key.getBytes())));
+                System.out.println();
+                printMenu();
+                break;
+            case 3:
+                System.exit(0);
+                break;
+        }
     }
 
     public static byte[] encrypt(byte[] mas, byte[] key) {
-        RC6 rc6 = new RC6(key);
+
+        int k = key.length/4;
+        if((key.length%4>0) | (key.length==0)) k++;
+        byte[] key1 = new byte[k*4];
+        for(int i=0;i<key1.length;i++){
+            if(i<key.length)
+                key1[i] = key[i];
+            else
+                key1[i]=0;
+        }
+
+        RC6 rc6 = new RC6(key1);
         byte[] block = new byte[16];
         byte[] res = new byte[0];
         int n = 0;
@@ -33,7 +80,18 @@ public class Main {
     }
 
     public static byte[] decrypt(byte[] mas, byte[] key) {
-        RC6 rc6 = new RC6(key);
+
+        int k = key.length/4;
+        if((key.length%4>0) | (key.length==0)) k++;
+        byte[] key1 = new byte[k*4];
+        for(int i=0;i<key1.length;i++){
+            if(i<key.length)
+                key1[i] = key[i];
+            else
+                key1[i]=0;
+        }
+
+        RC6 rc6 = new RC6(key1);
         byte[] block = new byte[16];
         byte[] res = new byte[0];
         int n = 0;

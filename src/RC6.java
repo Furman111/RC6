@@ -11,7 +11,8 @@ public class RC6 {
     private int[] S;
 
     public RC6(byte[] key) {
-        this.key = key.clone();S = generateSubkeys(this.key);
+        this.key = key.clone();
+        S = generateSubkeys(this.key);
     }
 
     public byte[] encryptBlock(byte[] input){
