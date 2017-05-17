@@ -3,40 +3,41 @@
  */
 public class RC6 {
 
-    public  static final int W =32;
-    public static final int R=20;
-    private static final int Pw=0xb7e15163,Qw = 0x9e3779b9;
+    public static final int W = 32;
+    public static final int R = 20;
+    private static final int Pw = 0xb7e15163, Qw = 0x9e3779b9;
 
     private byte[] key;
-    private int[] s;
+    private int[] S;
 
-    public RC6(byte[] key){
-        this.key = key.clone();
-        s = generateSubkeys(this.key);
+    public RC6(byte[] key) {
+        this.key = key.clone();S = generateSubkeys(this.key);
     }
 
-    public byte[] encryptBlock(byte[] input){  //input - 128 битный блок, те массив из 16 байтов
+    public byte[] encryptBlock(byte[] input){
 
         byte[] tmp = new byte[input.length];
         int t,u;
         int aux;
-        int[] data = new int[input.length/4];           //заводим буфер под слово длиной 32 бита
-        for(Integer a: data)
-            a = 0;
-
+        int[] data = new int[input.length/4];
+        for(int i =0;i<data.length;i++)
+            data[i] = 0;
         int off = 0;
-        for(int i=0;i<data.length;i++){   //заполняем буфер 32 битными словами
-            data[i] = ((input[off++]))|((input[off++]&0xff) << 8)|((input[off++]&0xff) << 16)|((input[off++]&0xff) << 24);
+        for(int i=0;i<data.length;i++){
+            data[i] = ((input[off++]&0xff))|
+                    ((input[off++]&0xff) << 8)|
+                    ((input[off++]&0xff) << 16)|
+                    ((input[off++]&0xff) << 24);
         }
-        int A = data[0], B = data[1], C = data[2], D = data[3];
+        int A = data[0],B = data[1],C = data[2],D = data[3];
 
-        B = B+ s[0];
-        D = D+ s[1];
-        for(int i=1;i<=R;i++){
+        B = B + S[0];
+        D = D + S[1];
+        for(int i = 1;i<=R;i++){
             t = rotl(B*(2*B+1),5);
             u = rotl(D*(2*D+1),5);
-            A = rotl(A^t,u)+ s[2*i];
-            C = rotl(C^u,t)+ s[2*i+1];
+            A = rotl(A^t,u)+S[2*i];
+            C = rotl(C^u,t)+S[2*i+1];
 
             aux = A;
             A = B;
@@ -44,14 +45,11 @@ public class RC6 {
             C = D;
             D = aux;
         }
-        A = A + s[2*R+2];
-        C = C + s[2*R+3];
-        data[0] = A;
-        data[1] = B;
-        data[2] = C;
-        data[3] = D;
+        A = A + S[2*R+2];
+        C = C + S[2*R+3];
+        data[0] = A;data[1] = B;data[2] = C;data[3] = D;
 
-        for(int i = 0; i<tmp.length;i++){
+        for(int i = 0;i<tmp.length;i++){
             tmp[i] = (byte)((data[i/4] >>> (i%4)*8) & 0xff);
         }
 
@@ -75,8 +73,8 @@ public class RC6 {
 
         int A = data[0],B = data[1],C = data[2],D = data[3];
 
-        C = C - s[2*R+3];
-        A = A - s[2*R+2];
+        C = C - S[2*R+3];
+        A = A - S[2*R+2];
         for(int i = R;i>=1;i--){
             aux = D;
             D = C;
@@ -86,11 +84,11 @@ public class RC6 {
 
             u = rotl(D*(2*D+1),5);
             t = rotl(B*(2*B + 1),5);
-            C = rotr(C- s[2*i + 1],t) ^ u;
-            A = rotr(A- s[2*i],u) ^ t;
+            C = rotr(C-S[2*i + 1],t) ^ u;
+            A = rotr(A-S[2*i],u) ^ t;
         }
-        D = D - s[1];
-        B = B - s[0];
+        D = D - S[1];
+        B = B - S[0];
 
         data[0] = A;data[1] = B;data[2] = C;data[3] = D;
 
@@ -104,23 +102,27 @@ public class RC6 {
     private static int rotl(int val, int pas) {
         return (val << pas) | (val >>> (32 - pas));
     }
+
     private static int rotr(int val, int pas) {
-        return (val >>> pas) | (val << (32-pas));
+        return (val >>> pas) | (val << (32 - pas));
     }
 
-    private static int[] convBytesWords(byte[] key,int c){
+    private static int[] convBytesWords(byte[] key, int c) {
         int[] tmp = new int[c];
-        for(Integer a: tmp)
-            a=0;
+        for (int i = 0; i < tmp.length; i++)
+            tmp[i] = 0;
 
-        int off = 0;
-        for(int i =0;i<tmp.length;i++)
-            tmp[i] = ((key[off++] & 0xff))|((key[off++] & 0xff) << 8)|((key[off++] & 0xff) << 16)|((key[off++] & 0xff) << 24);
+        for (int i = 0, off = 0; i < c; i++)
+            tmp[i] = ((key[off++] & 0xFF))|
+                    ((key[off++] & 0xFF) << 8)|
+                    ((key[off++] & 0xFF) << 16)|
+                    ((key[off++] & 0xFF) << 24);
 
         return tmp;
     }
 
     private static int[] generateSubkeys(byte[] key) {
+
         int u = W / 8;
         int c = key.length / u;
         int t = 2 * R + 4;
@@ -143,7 +145,9 @@ public class RC6 {
             B = L[j] = rotl(L[j] + A + B, A + B);
             k = (k + 1) % t;
             j = (j + 1) % c;
+
         }
+
         return S;
     }
 }

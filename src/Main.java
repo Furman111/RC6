@@ -6,9 +6,9 @@ public class Main {
 
     public static void main(String[] args) {
         try {
-            String key = "zxcv";
+            String key = "dsadasdfasgfwaet235214123";
             RC6 rc6 = new RC6(key.getBytes());
-            printByteMas(rc6.decryptBlock(rc6.encryptBlock(new byte[]{-42,-43,-45,-42,-42,-67,-42,-52,-23,-127,-23,-24,-23,-87,-45,-91})));
+            printByteMas(rc6.decryptBlock(rc6.encryptBlock(new byte[]{24,43,45,42,-42,-67,-42,-52,-23,127,23,24,23,87,45,91})));
         }
         catch (Exception e){}
     }
