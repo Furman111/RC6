@@ -1,3 +1,4 @@
+import java.util.Base64;
 import java.util.Scanner;
 
 /**
@@ -6,47 +7,53 @@ import java.util.Scanner;
 public class Main {
 
     public static void main(String[] args) {
-        System.setProperty("file.encoding", "UTF-16");
-        printMenu();
+        try {
+            printMenu();
+        }
+        catch (Exception e){}
     }
 
     public static void printMenu(){
-        System.out.println("1 - Зашифровать слово");
-        System.out.println("2 - Расшифровать слово");
-        System.out.println("3 - Выйти из программы:");
-        System.out.println("Введите цифру(1/2/3):");
-        Scanner scanner = new Scanner(System.in);
-        int k = -1;
-        while ((k<1) || (k>3)){
-            k = scanner.nextInt();
+        try {
+            System.out.println("1 - Зашифровать слово");
+            System.out.println("2 - Расшифровать слово");
+            System.out.println("3 - Выйти из программы:");
+            System.out.println("Введите цифру(1/2/3):");
+            Scanner scanner = new Scanner(System.in);
+            int k = -1;
+            while ((k < 1) || (k > 3)) {
+                k = scanner.nextInt();
+            }
+            switch (k) {
+                case 1:
+                    String word,key;
+                    System.out.println();
+                    System.out.println("Введите ключ:");
+                    key = scanner.next();
+                    System.out.println("Введите слово:");
+                    word = scanner.next();
+                    System.out.println("\nРезультат:");
+                    System.out.println(Base64.getEncoder().encodeToString(encrypt(word.getBytes(),key.getBytes())));
+                    System.out.println();
+                    printMenu();
+                    break;
+                case 2:
+                    System.out.println();
+                    System.out.println("Введите ключ:");
+                    key = scanner.next();
+                    System.out.println("Введите слово:");
+                    word = scanner.next();
+                    System.out.println("\nРезультат:");
+                    System.out.println(new String(decrypt(Base64.getDecoder().decode(word),key.getBytes())));
+                    System.out.println();
+                    printMenu();
+                    break;
+                case 3:
+                    System.exit(0);
+                    break;
+            }
         }
-        switch (k){
-            case 1:
-                System.out.println();
-                System.out.println("Введите ключ:");
-                String key = scanner.next();
-                System.out.println("Введите слово:");
-                String word = scanner.next();
-                System.out.println("\nРезультат:");
-                System.out.println(new String(encrypt(word.getBytes(),key.getBytes())));
-                System.out.println();
-                printMenu();
-                break;
-            case 2:
-                System.out.println();
-                System.out.println("Введите ключ:");
-                key = scanner.next();
-                System.out.println("Введите слово:");
-                word = scanner.next();
-                System.out.println("\nРезультат:");
-                System.out.println(new String(decrypt(word.getBytes(),key.getBytes())));
-                System.out.println();
-                printMenu();
-                break;
-            case 3:
-                System.exit(0);
-                break;
-        }
+        catch (Exception e) {}
     }
 
     public static byte[] encrypt(byte[] mas, byte[] key) {
@@ -117,13 +124,5 @@ public class Main {
             tmp[i+current.length] = add[i];
         return tmp;
     }
-
-    public static void printByteMas(byte[] input) {
-        for (int i = 0; i < input.length; i++) {
-            System.out.print(input[i] + " ");
-        }
-        System.out.println();
-    }
-
 
 }
