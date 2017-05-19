@@ -1,3 +1,5 @@
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.Base64;
 import java.util.Scanner;
 
@@ -7,65 +9,64 @@ import java.util.Scanner;
 public class Main {
 
     public static void main(String[] args) {
-        try {
-            printMenu();
-        }
-        catch (Exception e){}
+        printMenu();
     }
 
-    public static void printMenu(){
-        try {
+    public static void printMenu() {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(System.in))) {
             System.out.println("1 - Зашифровать слово");
             System.out.println("2 - Расшифровать слово");
             System.out.println("3 - Выйти из программы:");
             System.out.println("Введите цифру(1/2/3):");
             Scanner scanner = new Scanner(System.in);
+            String word, key;
             int k = -1;
             while ((k < 1) || (k > 3)) {
                 k = scanner.nextInt();
             }
             switch (k) {
                 case 1:
-                    String word,key;
                     System.out.println();
                     System.out.println("Введите ключ:");
-                    key = scanner.next();
+                    key = br.readLine();
                     System.out.println("Введите слово:");
-                    word = scanner.next();
+                    word = br.readLine();
                     System.out.println("\nРезультат:");
-                    System.out.println(Base64.getEncoder().encodeToString(encrypt(word.getBytes(),key.getBytes())));
+                    System.out.println(Base64.getEncoder().encodeToString(encrypt(word.getBytes(), key.getBytes())));
                     System.out.println();
                     printMenu();
                     break;
                 case 2:
                     System.out.println();
                     System.out.println("Введите ключ:");
-                    key = scanner.next();
+                    key = br.readLine();
                     System.out.println("Введите слово:");
-                    word = scanner.next();
+                    word = br.readLine();
                     System.out.println("\nРезультат:");
-                    System.out.println(new String(decrypt(Base64.getDecoder().decode(word),key.getBytes())));
+                    System.out.println(new String(decrypt(Base64.getDecoder().decode(word), key.getBytes())));
                     System.out.println();
                     printMenu();
                     break;
                 case 3:
+                    scanner.close();
                     System.exit(0);
                     break;
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        catch (Exception e) {}
     }
 
     public static byte[] encrypt(byte[] mas, byte[] key) {
 
-        int k = key.length/4;
-        if((key.length%4>0) | (key.length==0)) k++;
-        byte[] key1 = new byte[k*4];
-        for(int i=0;i<key1.length;i++){
-            if(i<key.length)
+        int k = key.length / 4;
+        if ((key.length % 4 > 0) | (key.length == 0)) k++;
+        byte[] key1 = new byte[k * 4];
+        for (int i = 0; i < key1.length; i++) {
+            if (i < key.length)
                 key1[i] = key[i];
             else
-                key1[i]=0;
+                key1[i] = 0;
         }
 
         RC6 rc6 = new RC6(key1);
@@ -81,21 +82,21 @@ public class Main {
                 else
                     block[j] = 0;
             }
-            res = append(res,rc6.encryptBlock(block));
+            res = append(res, rc6.encryptBlock(block));
         }
         return res;
     }
 
     public static byte[] decrypt(byte[] mas, byte[] key) {
 
-        int k = key.length/4;
-        if((key.length%4>0) | (key.length==0)) k++;
-        byte[] key1 = new byte[k*4];
-        for(int i=0;i<key1.length;i++){
-            if(i<key.length)
+        int k = key.length / 4;
+        if ((key.length % 4 > 0) | (key.length == 0)) k++;
+        byte[] key1 = new byte[k * 4];
+        for (int i = 0; i < key1.length; i++) {
+            if (i < key.length)
                 key1[i] = key[i];
             else
-                key1[i]=0;
+                key1[i] = 0;
         }
 
         RC6 rc6 = new RC6(key1);
@@ -111,17 +112,17 @@ public class Main {
                 else
                     block[j] = 0;
             }
-            res = append(res,rc6.decryptBlock(block));
+            res = append(res, rc6.decryptBlock(block));
         }
         return res;
     }
 
-    public static byte[] append(byte[] current, byte[] add){
-        byte[] tmp = new byte[current.length+add.length];
-        for(int i=0;i<current.length;i++)
+    public static byte[] append(byte[] current, byte[] add) {
+        byte[] tmp = new byte[current.length + add.length];
+        for (int i = 0; i < current.length; i++)
             tmp[i] = current[i];
-        for(int i=0;i<add.length;i++)
-            tmp[i+current.length] = add[i];
+        for (int i = 0; i < add.length; i++)
+            tmp[i + current.length] = add[i];
         return tmp;
     }
 
